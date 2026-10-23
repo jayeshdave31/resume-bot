@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jayesh Dave</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Inter:wght@400;500&display=swap">
+<style>
+/* ── tokens ── */
+:root {
+  --bg: #F1F5FB;
+  --surface: #FFFFFF;
+  --border: #DDE5EF;
+  --accent: #0A7A6E;
+  --accent-dim: rgba(10,122,110,.09);
+  --accent-border: rgba(10,122,110,.22);
+  --fg: #1A2535;
+  --fg-muted: #637389;
+  --user-bg: #0A7A6E;
+  --user-fg: #FFFFFF;
+  --ai-bg: #FFFFFF;
+  --hdr-bg: #FFFFFF;
+  --inp-bg: #FFFFFF;
+  --chip-fg: #0A7A6E;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #070F1B;
+    --surface: #0D1928;
+    --border: #192B3E;
+    --accent: #00C9B5;
+    --accent-dim: rgba(0,201,181,.09);
+    --accent-border: rgba(0,201,181,.22);
+    --fg: #D9EAFF;
+    --fg-muted: #5B7594;
+    --user-bg: #00C9B5;
+    --user-fg: #070F1B;
+    --ai-bg: #0D1928;
+    --hdr-bg: #0A1523;
+    --inp-bg: #0F1E30;
+    --chip-fg: #00C9B5;
+    color-scheme: dark;
+  }
+}
+
+/* ── reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* ── shell ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+/* ── header ── */
+.hdr {
+  flex-shrink: 0;
+  background: var(--hdr-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.av {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--user-fg);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .5px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.hdr-info { flex: 1; min-width: 0; }
+
+.hdr-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.hdr-sub {
+  font-size: 11.5px;
+  color: var(--fg-muted);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.hdr-links { display: flex; gap: 6px; flex-shrink: 0; }
+
+.hlink {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; font-family: inherit;
+  color: var(--fg-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color .15s, border-color .15s, background .15s;
+  white-space: nowrap;
+}
+
+.hlink:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-dim);
+}
+
+/* ── chat ── */
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── welcome ── */
+.welcome {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.welcome strong { color: var(--accent); font-weight: 600; }
+
+/* ── model badge ── */
+.model-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 100px;
+  padding: 3px 10px;
+  margin-top: 10px;
+}
+
+.model-badge svg { opacity: .7; }
+
+/* ── chips ── */
+.chips-section { margin-top: 2px; }
+.chips-lbl { font-size: 11px; color: var(--fg-muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 9px; }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  color: var(--chip-fg);
+  padding: 6px 13px;
+  border-radius: 100px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: filter .15s, transform .1s;
+}
+.chip:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+/* ── message row ── */
+.row { display: flex; gap: 9px; align-items: flex-start; }
+.row.user { flex-direction: row-reverse; }
+
+.row-av {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  flex-shrink: 0;
+}
+
+.row.ai .row-av { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.row.user .row-av { background: var(--border); color: var(--fg-muted); }
+
+/* ── bubble ── */
+.bbl {
+  max-width: min(510px, 84%);
+  padding: 11px 15px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.72;
+  min-width: 0;
+}
+
+.row.user .bbl { background: var(--user-bg); color: var(--user-fg); border-bottom-right-radius: 4px; }
+
+.row.ai .bbl {
+  background: var(--ai-bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+.bbl p { margin-bottom: 7px; }
+.bbl p:last-child { margin-bottom: 0; }
+.bbl ul { margin: 7px 0; padding-left: 18px; }
+.bbl li { margin-bottom: 3px; }
+.bbl strong { font-weight: 600; }
+.bbl code {
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: .88em;
+  background: var(--accent-dim);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ── typing dots ── */
+.dots { display: flex; gap: 4px; align-items: center; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .35; animation: blink 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: .22s; }
+.dot:nth-child(3) { animation-delay: .44s; }
+@keyframes blink { 0%,80%,100%{opacity:.35} 40%{opacity:.95} }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none; opacity: .65; } }
+
+/* ── error ── */
+.err { font-size: 13px; color: #b04040; background: rgba(176,64,64,.07); border: 1px solid rgba(176,64,64,.18); border-radius: 8px; padding: 10px 14px; }
+
+/* ── input bar ── */
+.inbar {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex; gap: 9px; align-items: flex-end;
+}
+
+.inwrap {
+  flex: 1; min-width: 0;
+  background: var(--inp-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  display: flex; align-items: flex-end;
+  padding: 9px 15px;
+  transition: border-color .15s;
+}
+.inwrap:focus-within { border-color: var(--accent); }
+
+textarea {
+  flex: 1; min-width: 0;
+  background: transparent; border: none; outline: none;
+  font-family: inherit; font-size: 14px; color: var(--fg);
+  resize: none; line-height: 1.5;
+  min-height: 21px; max-height: 112px; overflow-y: auto;
+}
+textarea::placeholder { color: var(--fg-muted); }
+
+.snd {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--user-fg); flex-shrink: 0;
+  transition: opacity .15s, transform .1s;
+}
+.snd:hover:not(:disabled) { opacity: .85; transform: scale(1.05); }
+.snd:disabled { opacity: .35; cursor: not-allowed; }
+.snd:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .hdr-links .hlink span { display: none; }
+  .hlink { padding: 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="hdr">
+    <div class="av">JD</div>
+    <div class="hdr-info">
+      <div class="hdr-name">Jayesh Dave</div>
+      <div class="hdr-sub">Junior AI Developer · Forage AI</div>
+    </div>
+    <nav class="hdr-links">
+      <button class="hlink" id="emailBtn" title="Copy email">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        <span>Email</span>
+      </button>
+      <a class="hlink" href="https://linkedin.com/in/jayesh-dave-6b08ba1bb" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        <span>LinkedIn</span>
+      </a>
+      <a class="hlink" href="https://github.com/jayeshdave31" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        <span>GitHub</span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="chat" id="chat">
+    <div class="welcome">
+      Hi there! I'm an AI assistant for <strong>Jayesh Dave's</strong> professional profile.
+      Ask me anything about his experience, skills, projects, or education.
+      <div class="model-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Powered by Nemotron via OpenRouter
+      </div>
+    </div>
+    <div class="chips-section" id="chipsSection">
+      <p class="chips-lbl">Try asking</p>
+      <div class="chips" id="chipsEl"></div>
+    </div>
+  </main>
+
+  <div class="inbar">
+    <div class="inwrap">
+      <textarea id="inp" placeholder="Ask about Jayesh…" rows="1" aria-label="Type your question"></textarea>
+    </div>
+    <button class="snd" id="snd" aria-label="Send">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+const QUICK_QS = [
+  "What's Jayesh's current role?",
+  "What AI/ML skills does he have?",
+  "Tell me about his RAG project",
+  "What companies has he worked at?",
+  "What's his educational background?",
+  "How can I contact Jayesh?",
+];
+
+const chatEl       = document.getElementById('chat');
+const inpEl        = document.getElementById('inp');
+const sndBtn       = document.getElementById('snd');
+const chipsSection = document.getElementById('chipsSection');
+const chipsEl      = document.getElementById('chipsEl');
+
+let history = [];
+let busy    = false;
+
+// build chips
+QUICK_QS.forEach(q => {
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.textContent = q;
+  c.addEventListener('click', () => send(q));
+  chipsEl.appendChild(c);
+});
+
+// email copy
+document.getElementById('emailBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('emailBtn');
+  try {
+    await navigator.clipboard.writeText('davejay118@gmail.com');
+    btn.querySelector('span').textContent = '✓ Copied';
+  } catch {
+    btn.querySelector('span').textContent = 'davejay118@gmail.com';
+  }
+  setTimeout(() => { btn.querySelector('span').textContent = 'Email'; }, 2500);
+});
+
+// textarea resize
+inpEl.addEventListener('input', () => {
+  sndBtn.disabled = busy || !inpEl.value.trim();
+  inpEl.style.height = 'auto';
+  inpEl.style.height = Math.min(inpEl.scrollHeight, 112) + 'px';
+});
+
+inpEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (!sndBtn.disabled) send(inpEl.value.trim());
+  }
+});
+
+sndBtn.addEventListener('click', () => {
+  const t = inpEl.value.trim();
+  if (t) send(t);
+});
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function applyInline(s) {
+  return s
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+function mdToHtml(raw) {
+  const lines = esc(raw).split('\n');
+  const out = [];
+  let listBuf = [];
+
+  const flushList = () => {
+    if (listBuf.length) { out.push('<ul>' + listBuf.join('') + '</ul>'); listBuf = []; }
+  };
+
+  for (const ln of lines) {
+    const bull = ln.match(/^[\s]*[•\-\*]\s+(.+)/);
+    if (bull) {
+      listBuf.push('<li>' + applyInline(bull[1]) + '</li>');
+    } else {
+      flushList();
+      const t = ln.trim();
+      if (t) out.push('<p>' + applyInline(t) + '</p>');
+    }
+  }
+  flushList();
+  return out.join('');
+}
+
+function scrollEnd() {
+  chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' });
+}
+
+function addRow(role, html) {
+  const row = document.createElement('div');
+  row.className = 'row ' + role;
+  row.innerHTML = `<div class="row-av">${role === 'ai' ? 'JD' : 'You'}</div><div class="bbl">${html}</div>`;
+  chatEl.appendChild(row);
+  return row;
+}
+
+function dotsHtml() {
+  return '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+}
+
+async function send(text) {
+  if (busy) return;
+  busy = true;
+  sndBtn.disabled = true;
+  inpEl.value = '';
+  inpEl.style.height = 'auto';
+
+  chipsSection.hidden = true;
+
+  addRow('user', '<p>' + esc(text) + '</p>');
+  scrollEnd();
+
+  const aiRow = addRow('ai', dotsHtml());
+  const bbl   = aiRow.querySelector('.bbl');
+  scrollEnd();
+
+  history.push({ role: 'user', content: text });
+
+  let fullText = '';
+
+  try {
+    const resp = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(err.detail || resp.statusText);
+    }
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let done = false;
+
+    while (!done) {
+      const { done: streamDone, value } = await reader.read();
+      if (streamDone) break;
+
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();   // keep partial line in buffer
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+
+        if (payload === '[DONE]') { done = true; break; }
+
+        try {
+          const chunk = JSON.parse(payload);
+          if (chunk.error) throw new Error(chunk.detail || 'Stream error from server');
+          if (chunk.delta) {
+            fullText += chunk.delta;
+            bbl.innerHTML = mdToHtml(fullText) || dotsHtml();
+            scrollEnd();
+          }
+        } catch (e) {
+          if (e.message === 'Stream error from server') throw e;
+          console.warn('SSE parse skip:', line.slice(0, 80));
+        }
+      }
+    }
+
+    // always update bubble when stream ends — clears dots if model returned nothing
+    if (!fullText) {
+      bbl.innerHTML = '<p style="color:var(--fg-muted)">No response — check server logs for details.</p>';
+      console.warn('Stream ended with no content.');
+    } else {
+      bbl.innerHTML = mdToHtml(fullText);
+    }
+
+    console.log('Response complete, length:', fullText.length);
+    history.push({ role: 'assistant', content: fullText });
+
+  } catch (err) {
+    bbl.innerHTML = '<p class="err">⚠ ' + esc(err.message || 'Something went wrong. Is the server running?') + '</p>';
+    history.pop();   // remove the user message so they can retry
+  }
+
+  busy = false;
+  sndBtn.disabled = !inpEl.value.trim();
+  inpEl.focus();
+}
+</script>
+</body>
+</html>
