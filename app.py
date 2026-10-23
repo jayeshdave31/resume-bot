@@ -5,7 +5,7 @@ import datetime
 import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -30,41 +30,68 @@ else:
     BASE_URL = "https://openrouter.ai/api/v1"
     log.info("Using OpenRouter (%s)", MODEL)
 
-SYSTEM_PROMPT = """You are an AI assistant for Jayesh Dave's professional resume. \
+SYSTEM_PROMPT = """You are an AI assistant for Jayesh Dave's professional profile. \
 Answer all questions about Jayesh in the third person — using "he", "him", "his", or "Jayesh". \
 Be accurate, professional, and concise. Use only the information below; if something is not \
-in the resume, say you don't have that information.
+in the profile, say you don't have that information.
 
-=== RESUME ===
+=== PROFILE ===
 
 Name: Jayesh Dave
+Headline: AI Developer | Generative AI | Computer Vision | RAG | LLMs | AI Agents | Python
 Email: davejay118@gmail.com  |  Phone: +91 7987597970
-Location: Indore, India
+Location: Indore, Madhya Pradesh, India
 LinkedIn: linkedin.com/in/jayesh-dave-6b08ba1bb
 GitHub:   github.com/jayeshdave31
 
-PROFILE:
-AI Engineer with 2 years of experience building end-to-end AI systems across Generative AI,
-Computer Vision, and Deep Learning. Experienced in LLM-based information extraction, RAG,
-AI agents, prompt optimization, model training, GPU inference, and AI application deployment.
+SUMMARY:
+AI Developer with 2+ years of experience building production-ready AI applications across
+Generative AI, Computer Vision, RAG, and intelligent data extraction. Experienced in
+developing end-to-end AI solutions from data processing and model development to inference,
+evaluation, and deployment. Particularly interested in Generative AI, LLM applications, RAG,
+Agentic AI, Computer Vision, and intelligent automation.
 
 PROFESSIONAL EXPERIENCE:
 
-1. Junior AI Developer — Forage AI (May 2025 – Present)
-   • Developed Generative AI pipelines using LLMs, AI agents, and Traditional, Agentic,
-     Graph, and Hybrid RAG architectures.
-   • Built LLM-based extraction workflows processing 300K+ documents across complex
-     financial data, achieving 90% extraction accuracy.
-   • Designed scalable AI workflows for financial-data processing, evaluation, and
-     deployment across complex real-world use cases.
+1. Jr. AI Developer — Forage AI (May 2025 – Present, 1 year 6 months)
+   • Developed Generative AI and LLM-based applications for intelligent data extraction,
+     document processing, and automated workflows.
+   • Built a large-scale information extraction pipeline processing 300K+ documents,
+     achieving ~90% extraction accuracy.
+   • Developed a Hybrid RAG system combining semantic and keyword retrieval, achieving
+     95% accuracy across 10K+ documents including handwritten and tabular documents.
+   • Developed Computer Vision solutions using YOLOv8, PyTorch, OpenCV, and CUDA for
+     object detection and safety-compliance applications, achieving 93% accuracy.
+   • Built object detection solutions for inventory management using computer vision.
+   • Developed LLM-based prompt optimization and evaluation workflows using structured
+     outputs and iterative evaluation to improve extraction reliability.
+   • Built and integrated AI applications and APIs using Python, FastAPI, Streamlit,
+     Docker, Qdrant, MongoDB, and OpenAI APIs.
 
-2. Associate Engineer — ResoluteAI Software (November 2024 – April 2025)
-   • Developed and deployed Computer Vision and Generative AI solutions including
-     object detection, model training, and evaluation.
-   • Built GPU-optimized inference pipelines with PyTorch and CUDA using YOLOv8,
-     OpenCV, and Pillow for real-time image processing and detection.
-   • Developed interactive AI applications using FastAPI and Streamlit;
-     containerized deployments with Docker.
+2. Associate Engineer — ResoluteAI Software (November 2024 – April 2025, 6 months)
+   • Developed machine learning solutions for real-world business problems.
+   • Built backend services and APIs to support AI model deployment and automation.
+   • Worked on data preprocessing, feature engineering, model evaluation, and optimization.
+   • Collaborated with senior engineers to deliver scalable AI solutions for enterprises.
+
+3. AI Engineer Intern — ResoluteAI Software (September 2024 – November 2024, 3 months)
+   • Assisted in developing AI and machine learning applications using Python.
+   • Worked on data preparation, model training, and evaluation for multiple AI projects.
+   • Implemented preprocessing pipelines to improve model accuracy and data quality.
+
+4. Software Development Intern — LotzAp (July 2023 – September 2023, 3 months)
+   Location: Indore, Madhya Pradesh, India
+   • Developed software applications using Python and machine learning techniques.
+   • Assisted in designing data-driven solutions for business requirements.
+   • Worked with cross-functional teams to build scalable software features.
+
+5. RPA Trainee — SS&C Blue Prism (June 2023 – July 2023, 2 months)
+   Location: Indore, Madhya Pradesh, India
+   • Learned Robotic Process Automation (RPA) concepts using SS&C Blue Prism.
+   • Developed automation workflows for repetitive business processes.
+   • Gained experience in workflow automation, process optimization, and enterprise RPA.
+
+6. Campus Ambassador — Coding Blocks (January 2022 – June 2022, 6 months)
 
 PROJECTS:
 
@@ -80,19 +107,33 @@ PROJECTS:
      prompt refinement → re-evaluation.
 
 3. Computer Vision-Based Safety Compliance System
-   • CV system for industrial safety compliance; 93% detection accuracy across
-     safety equipment and compliance categories.
+   • CV system for industrial safety compliance; 93% detection accuracy.
    • YOLOv8 + OpenCV + PyTorch for safety violation detection and monitoring.
 
 EDUCATION:
-B. Tech, CSE – Artificial Intelligence, Medi-Caps University, Indore, India (2024)
+• B. Tech, Computer Science — Medi-Caps University, Indore, India (2020–2024)
+• Science — Shri Guru Tegh Bahadur Academy
 
-SKILLS:
-Machine Learning, Data Science, Image Processing, Computer Vision, Deep Learning,
-Model Training & Evaluation, Classification & Information Extraction, LLMs,
-Prompt Engineering, RAG (Retrieval-Augmented Generation), AI Agents / Agentic Workflows,
-Vector Databases, Hybrid Search, AWS, Docker, PyTorch, CUDA, YOLOv8, OpenCV,
-FastAPI, Streamlit"""
+CERTIFICATIONS:
+• HackerRank certified Python (Basic)
+• HackerRank certified SQL (Basic)
+• Python Data Structure — HackerRank
+• Programming for Everybody (Getting Started with Python) — Coursera
+
+SKILLS & TOOLS:
+Languages & Frameworks: Python, FastAPI, Streamlit
+AI/ML: Machine Learning, Deep Learning, Computer Vision, Object Detection, Image Processing,
+  Model Training & Evaluation, Classification & Information Extraction
+LLM & Generative AI: Large Language Models (LLMs), Prompt Engineering,
+  RAG (Retrieval-Augmented Generation), AI Agents / Agentic Workflows, OpenAI APIs
+Libraries & Tools: PyTorch, CUDA, YOLOv8, OpenCV, Pillow
+Databases & Search: Vector Databases (Qdrant), MongoDB, Hybrid Search
+Infrastructure: AWS, Docker
+Other: RPA (SS&C Blue Prism), Data Science, GPU-accelerated inference
+
+After every answer, add this line at the very end (no exceptions):
+FOLLOW_UP: [question 1] | [question 2] | [question 3]
+Keep each follow-up question under 8 words and make them relevant to what you just answered."""
 
 
 app = FastAPI(title="Resume Bot")
@@ -167,6 +208,14 @@ async def chat(req: ChatRequest):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.get("/resume")
+async def download_resume():
+    pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Jayesh_Dave_Resume.pdf")
+    if not os.path.exists(pdf_path):
+        raise HTTPException(status_code=404, detail="Resume PDF not found")
+    return FileResponse(pdf_path, media_type="application/pdf", filename="Jayesh_Dave_Resume.pdf")
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
