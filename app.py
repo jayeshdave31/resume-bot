@@ -15,8 +15,20 @@ log = logging.getLogger("resumebot")
 
 load_dotenv()
 
-API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-MODEL   = os.getenv("MODEL", "nvidia/llama-3.1-nemotron-70b-instruct:free")
+MODEL = os.getenv("MODEL", "gemini-2.0-flash")
+
+# Use Gemini if a Gemini key is set, otherwise fall back to OpenRouter
+GEMINI_KEY    = os.getenv("GEMINI_API_KEY", "")
+OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY", "")
+
+if GEMINI_KEY:
+    API_KEY  = GEMINI_KEY
+    BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
+    log.info("Using Gemini (%s)", MODEL)
+else:
+    API_KEY  = OPENROUTER_KEY
+    BASE_URL = "https://openrouter.ai/api/v1"
+    log.info("Using OpenRouter (%s)", MODEL)
 
 SYSTEM_PROMPT = """You are an AI assistant for Jayesh Dave's professional resume. \
 Answer all questions about Jayesh in the third person — using "he", "him", "his", or "Jayesh". \
@@ -110,12 +122,10 @@ async def chat(req: ChatRequest):
         async with httpx.AsyncClient(timeout=60.0) as client:
             async with client.stream(
                 "POST",
-                "https://openrouter.ai/api/v1/chat/completions",
+                f"{BASE_URL}/chat/completions",
                 headers={
                     "Authorization": f"Bearer {API_KEY}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "http://localhost:8000",
-                    "X-Title": "Jayesh Dave Resume Bot",
                 },
                 json={
                     "model": MODEL,
